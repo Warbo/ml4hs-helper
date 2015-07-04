@@ -25,12 +25,11 @@ run args stdin = cmd stdin
 -- Build a command for GHCi to inspect the type of each name
 -- The ":m" unloads everything except Prelude, ensuring that names all get
 -- qualified and we can't see any non-exported members
-typeCommand = S.toString .
-              T.unlines  .
-              (":m":)    .
-              map cmd    .
-              parseLisps .
+typeCommand = typeCommand' .
+              parseLisps   .
               S.fromString
+
+typeCommand' = S.toString . T.unlines . (":m":) . map cmd
   where cmd s = T.concat [":t (", getQName s, ")"]
 
 -- Try to partially-apply ">" to each value, to see if it admits an instance
@@ -119,15 +118,17 @@ snoc   (L.List xs) x = L.List (xs ++ [x])
 
 -- | Input has the form (id ast), where id may have many components
 
-unString (L.String x) = x
+unString (L.String x) = reString x
 getId      = nth 0
 getAst     = nth 1
+
+getPkg, getMod, getName, getQName :: S.Stringable a => L.Lisp -> a
 getPkg     = unString . nth 1 . getId
 getMod     = unString . nth 2 . getId
 getName    = unString . nth 3 . getId
-getQName x = let m = getMod x
-                 n = getName x
-             in  T.concat [m, ".", n]
+getQName x = let m = getMod  x :: String
+                 n = getName x :: String
+             in  reString (concat [m, ".", n])
 
 reString :: (S.Stringable a, S.Stringable b) => a -> b
 reString = S.fromString . S.toString
