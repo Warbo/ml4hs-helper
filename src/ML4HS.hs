@@ -1,9 +1,7 @@
-#!/usr/bin/env runhaskell
-
 {-# LANGUAGE OverloadedStrings #-}
+module ML4HS where
 
 import Data.Maybe
-import System.Environment
 import qualified Data.Attoparsec       as A
 import qualified Data.ByteString       as B
 import qualified Data.ByteString.Char8 as C
@@ -14,9 +12,6 @@ import qualified Data.Text             as T
 -- To minimise headaches, we try to use s-expressions for data interchange.
 -- We use types, parsers and pretty-printers from AttoLisp, which forces us to
 -- juggle Strings, ByteStrings and Text using toString and fromString.
-
-main = do args <- getArgs
-          interact (run args)
 
 run :: [String] -> String -> String
 run args stdin = cmd stdin
