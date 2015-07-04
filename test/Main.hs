@@ -1,8 +1,9 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, FlexibleContexts #-}
 module Main where
 
 import Data.List
 import qualified Data.AttoLisp as L
+import qualified Data.Text     as T
 import ML4HS
 import Test.QuickCheck
 import Test.Tasty (defaultMain, testGroup)
@@ -10,6 +11,7 @@ import Test.Tasty.QuickCheck
 
 main = defaultMain $ testGroup "All tests" [
     testProperty "typeCommand includes everything" typeCmdAll
+  , testProperty "typeCommand unloads modules"     typeCmdMod
   ]
 
 typeCmdAll = forAll (listOf genAst) typeCmdAll'
@@ -18,6 +20,23 @@ typeCmdAll' ls = debug (("cmd", cmd)) $ ls `allIn` cmd
   where cmd            = typeCommand' ls
         allIn []     _ = True
         allIn (l:ls) s = ":t (" ++ getQName l ++ ")" `elem` lines s
+
+typeCmdMod = forAll (listOf genAst) hasMod
+  where hasMod = (":m" ==) . head . lines . typeCommand'
+
+ordLineArity = forAll genTypeLine ordLineArity'
+
+ordLineArity' :: (String, String, String) -> Bool
+ordLineArity' (m, n, t) = argCount == arity t
+  where argCount = pred                  .
+                   length                .
+                   T.splitOn "undefined" .
+                   reString              .
+                   ordLine               .
+                   reString              $
+                   mkTypeLine m n t
+
+-- Helpers
 
 debug = whenFail . print
 
@@ -33,6 +52,18 @@ genAst = do
         ]
     , lString ast
     ]
+
+-- Type names look like module names. Feel free to make this more exhaustive.
+genType = fmap (intercalate " -> " . map (reString . (\(M x) -> x)))
+               (listOf1 arbitrary)
+
+genTypeLine = do
+  (M m, N n) <- arbitrary
+  t <- genType
+  return (m, n, t)
+
+mkTypeLine m n t = concat ["(", mkQName m n, ") :: ", t]
+mkQName m n = concat [m, ".", n]
 
 lString :: String -> L.Lisp
 lString = L.String . reString

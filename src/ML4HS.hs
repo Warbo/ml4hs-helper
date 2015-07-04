@@ -68,10 +68,11 @@ isSig _                          = False
 
 ordLine x = T.concat [":t (", applyTo ">" result, ")"]
   where [name, typeStr] = T.splitOn " :: " x
-        typeExpr = typeLisp (reString typeStr)
-        result   = addArgs name (arity typeExpr)
+        result = addArgs name (arity typeStr)
 
-arity (L.List xs) = length xs - 1
+arity :: S.Stringable a => a -> Int
+arity = arity' . typeLisp . reString
+  where arity' (L.List xs) = 1 - length xs
 
 applyTo x y = T.concat ["(", x, ") (", y, ")"]
 
