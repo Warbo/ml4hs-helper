@@ -25,6 +25,7 @@ executable ML4HSHelper
                      , atto-lisp
                      , stringable
                      , bytestring
+                     , text
   hs-source-dirs:      src
   default-language:    Haskell2010
 
@@ -41,3 +42,4 @@ test-suite test
                      , atto-lisp
                      , stringable
                      , bytestring
+                     , text
