@@ -1,0 +1,7 @@
+Helper functions for ML4HS
+
+ML4HS plugs together a number of components using shell scripts. This
+is great for process, stream and file manipulation; but not so much
+for safe, maintainable logic and data processing.
+
+That's what this project provides.
