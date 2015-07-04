@@ -32,4 +32,4 @@ test-suite test
   build-depends:       base >= 4.7
                      , QuickCheck
                      , tasty >= 0.7
-                     , tasty-quickcheck:
+                     , tasty-quickcheck
