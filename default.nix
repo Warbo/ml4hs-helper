@@ -1,4 +1,5 @@
-{ mkDerivation, base, QuickCheck, stdenv, tasty, tasty-quickcheck
+{ mkDerivation, atto-lisp, attoparsec, base, bytestring, QuickCheck
+, stdenv, stringable, tasty, tasty-quickcheck
 }:
 mkDerivation {
   pname = "ML4HSHelper";
@@ -6,8 +7,11 @@ mkDerivation {
   src = ./.;
   isLibrary = false;
   isExecutable = true;
-  buildDepends = [ base ];
-  testDepends = [ base QuickCheck tasty tasty-quickcheck ];
+  buildDepends = [ atto-lisp attoparsec base bytestring stringable ];
+  testDepends = [
+    atto-lisp attoparsec base bytestring QuickCheck stringable tasty
+    tasty-quickcheck
+  ];
   homepage = "http://chriswarbo.net/git/ml4hs-helper";
   description = "Helper functions for ML4HS";
   license = stdenv.lib.licenses.publicDomain;
