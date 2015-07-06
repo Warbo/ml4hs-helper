@@ -28,7 +28,7 @@ instance Arbitrary Pkg where
   arbitrary = fmap P $ listOf1 (elements (lower ++ "-0123456789"))
 
 instance Arbitrary Mod where
-  arbitrary = fmap (M . intercalate ".") (listOf1 genBit)
+  arbitrary = fmap (M . intercalate "." . take 5) (listOf1 genBit)
     where genBit = do
             init <- elements upper
             rest <- listOf (elements (upper ++ lower))
@@ -43,7 +43,7 @@ instance Arbitrary Name where
 instance Arbitrary TArg where
   arbitrary = do
     ts <- listOf1 arbitrary
-    return . TA . unwords . map unMod $ ts
+    return . TA . unwords . map unMod . take 3 $ ts
 
 instance Arbitrary QName where
   arbitrary = do

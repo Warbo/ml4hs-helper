@@ -26,8 +26,9 @@ parseFunc (NonEmpty ts) = uParse funType typeStr == expected
         expected = L.List (map reString ts)
 
 parseParens :: NonEmptyList (NonEmptyList TArg) -> Bool
-parseParens (NonEmpty ts) = lLength (uParse funType (typeStr ts)) == length ts
-  where mkChunk (NonEmpty xs) = T.concat ["(", mkFunType xs, ")"]
+parseParens (NonEmpty ts) = lLength (uParse funType (typeStr ts')) == length ts'
+  where ts'                   = take 10 ts
+        mkChunk (NonEmpty xs) = T.concat ["(", mkFunType (take 10 xs), ")"]
         typeStr               = mkFunType . map mkChunk
 
 arityMatches :: NonEmptyList TArg -> Bool

@@ -7,7 +7,7 @@ import Test.ML4HS.Types       as T
 import Test.Tasty
 import Test.Tasty.QuickCheck
 
-main = defaultMain . localOption (QuickCheckTests 10) $ testGroup "All tests" [
+main = defaultMain $ testGroup "All tests" [
     OC.tests
   , TC.tests
   , T.tests
