@@ -12,16 +12,28 @@ import Test.Tasty
 import Test.Tasty.QuickCheck
 
 tests = testGroup "Type tests" [
-    testProperty "Can parse ()"       parseUnit
-  , testProperty "Can parse function" parseFunc
+    testProperty "Can parse ()"        parseUnit
+  , testProperty "Can parse function"  parseFunc
+  , testProperty "(Parentheses) group" parseParens
+  , testProperty "Arity is correct"    arityMatches
   ]
 
-parseUnit = parse funType "()" == Just (L.List [L.String "()"])
+parseUnit = uParse funType "()" == L.List [L.String "()"]
 
-parseFunc (NonEmpty ts) = parse funType typeStr == Just expected
-  where ts'      = map (S.fromString . unTArg) ts
-        typeStr  = T.intercalate " -> " ts'
-        expected = L.List (map L.String ts')
+parseFunc :: NonEmptyList TArg -> Bool
+parseFunc (NonEmpty ts) = uParse funType typeStr == expected
+  where typeStr  = mkFunType ts
+        expected = L.List (map reString ts)
+
+parseParens :: NonEmptyList (NonEmptyList TArg) -> Bool
+parseParens (NonEmpty ts) = lLength (uParse funType (typeStr ts)) == length ts
+  where mkChunk (NonEmpty xs) = T.concat ["(", mkFunType xs, ")"]
+        typeStr               = mkFunType . map mkChunk
+
+arityMatches :: NonEmptyList TArg -> Bool
+arityMatches (NonEmpty ts) = arity (mkFunType ts) == length ts - 1
+
+-- Helpers
 
 inParens x  = "(" ++ stripParens x ++ ")"
 
@@ -29,8 +41,8 @@ stripParens = filter (not . (`elem` ("()"   :: String)))
 
 stripType   = filter (not . (`elem` ("()->" :: String)))
 
-parseSingle t = lLength result == 1
-  where Just result = parse funType . S.fromString . inParens $ t
-
 asString :: S.Stringable a => (String -> String) -> a -> a
 asString f = S.fromString . f . S.toString
+
+mkFunType :: S.Stringable a => [a] -> T.Text
+mkFunType = T.intercalate " -> " . map reString

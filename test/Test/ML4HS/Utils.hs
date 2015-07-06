@@ -1,17 +1,28 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Test.ML4HS.Utils where
 
 import Data.List
+import Data.String
 import qualified Data.AttoLisp   as L
 import qualified Data.Stringable as S
 import Test.QuickCheck
 
 -- Stringly-type our components
 
-newtype Pkg  = P  { unPkg  :: String } deriving (Show)
-newtype Mod  = M  { unMod  :: String } deriving (Show)
-newtype Name = N  { unName :: String } deriving (Show)
-newtype Type = T  { unType :: String } deriving (Show)
-newtype TArg = TA { unTArg :: String } deriving (Show)
+reString :: (S.Stringable a, S.Stringable b) => a -> b
+reString = S.fromString . S.toString
+
+instance S.Stringable L.Lisp where
+  toString (L.String x) = S.toString x
+  fromString = fromString
+  length = length . S.toString
+
+newtype Pkg   = P  { unPkg   :: String } deriving (Show, IsString, S.Stringable)
+newtype Mod   = M  { unMod   :: String } deriving (Show, IsString, S.Stringable)
+newtype Name  = N  { unName  :: String } deriving (Show, IsString, S.Stringable)
+newtype Type  = T  { unType  :: String } deriving (Show, IsString, S.Stringable)
+newtype TArg  = TA { unTArg  :: String } deriving (Show, IsString, S.Stringable)
+newtype QName = QN { unQName :: String } deriving (Show, IsString, S.Stringable)
 
 instance Arbitrary Pkg where
   arbitrary = fmap P $ listOf1 (elements (lower ++ "-0123456789"))
@@ -32,7 +43,12 @@ instance Arbitrary Name where
 instance Arbitrary TArg where
   arbitrary = do
     ts <- listOf1 arbitrary
-    return . TA . unwords . map (\(M x) -> x) $ ts
+    return . TA . unwords . map unMod $ ts
+
+instance Arbitrary QName where
+  arbitrary = do
+    (M m, N n) <- arbitrary
+    return (QN (m ++ "." ++ n))
 
 -- Custom generators
 
@@ -50,7 +66,7 @@ genAst = do
     ]
 
 -- Type names look like module names. Feel free to make this more exhaustive.
-genType = fmap (intercalate " -> " . map (\(M x) -> x))
+genType = fmap (intercalate " -> " . map unMod)
                (listOf1 arbitrary)
 
 genTypeLine = do

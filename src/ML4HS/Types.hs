@@ -9,6 +9,9 @@ import qualified Data.Text            as T
 
 -- Parsing Haskell type signatures
 
+uParse p x = let Just result = parse p x
+              in result
+
 parse p x = case AT.parseOnly (p <* AT.endOfInput) x of
   Left err -> Nothing
   Right x  -> Just x
@@ -32,4 +35,4 @@ unit = L.String <$> "()"
 
 arity :: T.Text -> Int
 arity = arity' . parse funType
-  where arity' (Just (L.List xs)) = 1 - length xs
+  where arity' (Just (L.List xs)) = length xs - 1

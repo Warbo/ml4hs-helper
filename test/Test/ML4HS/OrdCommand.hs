@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Test.ML4HS.OrdCommand where
 
+import Data.List
 import qualified Data.Stringable as S
 import qualified Data.Text       as T
 import ML4HS
@@ -10,14 +11,12 @@ import Test.Tasty
 import Test.Tasty.QuickCheck
 
 tests = testGroup "ordCommand tests" [
-    testProperty "ordLine handles arity" ordLineArity
+    testProperty "ordLine handles arity" ordLineArgCount
   ]
 
-ordLineArity = forAll genTypeLine check
-  where check  l@(_, _, t) = argCount l == arity (S.fromString t)
-        argCount (m, n, t) = pred                  .
-                             length                .
-                             T.splitOn "undefined" .
-                             ordLine               .
-                             S.fromString          $
-                             mkTypeLine m n t
+ordLineArgCount (NonEmpty ts) (QN n) = argCount == length ts
+  where argCount = length                .
+                   T.splitOn "undefined" .
+                   ordLine               .
+                   S.fromString          $
+                   n ++ " :: " ++ intercalate " -> " (map unTArg ts)
