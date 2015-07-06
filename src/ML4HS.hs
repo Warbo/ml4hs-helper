@@ -37,10 +37,6 @@ ordLine x = T.concat [":t (", applyTo ">" result, ")"]
   where [name, typeStr] = T.splitOn " :: " x
         result = addArgs name (arity typeStr)
 
-arity :: S.Stringable a => a -> Int
-arity = arity' . typeLisp . S.toString
-  where arity' (L.List xs) = 1 - length xs
-
 applyTo x y = T.concat ["(", x, ") (", y, ")"]
 
 addArgs x 0 = x

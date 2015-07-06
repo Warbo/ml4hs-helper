@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-
-module Test.ML4HS.OrdCommand (tests) where
+module Test.ML4HS.OrdCommand where
 
 import qualified Data.Stringable as S
 import qualified Data.Text       as T
 import ML4HS
+import ML4HS.Types
 import Test.ML4HS.Utils
 import Test.Tasty
 import Test.Tasty.QuickCheck
@@ -14,7 +14,7 @@ tests = testGroup "ordCommand tests" [
   ]
 
 ordLineArity = forAll genTypeLine check
-  where check  l@(_, _, t) = argCount l == arity t
+  where check  l@(_, _, t) = argCount l == arity (S.fromString t)
         argCount (m, n, t) = pred                  .
                              length                .
                              T.splitOn "undefined" .

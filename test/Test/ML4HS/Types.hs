@@ -1,33 +1,36 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Test.ML4HS.Types where
 
+import qualified Data.AttoLisp   as L
 import qualified Data.Stringable as S
+import qualified Data.Text       as T
 import ML4HS.Lisp
 import ML4HS.Types
+import Test.ML4HS.Utils
+import Test.QuickCheck
 import Test.Tasty
 import Test.Tasty.QuickCheck
 
 tests = testGroup "Type tests" [
-    testProperty "Can parse (parentheses)" parseBracketed1
+    testProperty "Can parse ()"       parseUnit
+  , testProperty "Can parse function" parseFunc
   ]
 
-parseBracketed1 :: String -> String -> Bool
-parseBracketed1 inner after = result == (inner', after)
-  where inner' = inParens inner
-        result = takeBracketed (inner' ++ after)
+parseUnit = parse funType "()" == Just (L.List [L.String "()"])
 
-parseBracketedN = forAll (infiniteListOf arbitrary) parseBracketedN'
+parseFunc (NonEmpty ts) = parse funType typeStr == Just expected
+  where ts'      = map (S.fromString . unTArg) ts
+        typeStr  = T.intercalate " -> " ts'
+        expected = L.List (map L.String ts')
 
-parseBracketedN' :: [Bool] -> [String] -> String -> Bool
-parseBracketedN' bs ss after = result == (made, after)
-  where make a  b         []     = a
-        make a  (True:bs) (x:xs) = make (a ++ inParens x)                  bs xs
-        make a (False:bs) (x:xs) = make ("(" ++ a ++ ")" ++ stripParens x) bs xs
-        made   = make "" bs ss
-        result = takeBracketed (made ++ after)
+inParens x  = "(" ++ stripParens x ++ ")"
 
-inParens x = "(" ++ stripParens x ++ ")"
-stripParens = filter (not . (`elem` ("()" :: String)))
+stripParens = filter (not . (`elem` ("()"   :: String)))
+
+stripType   = filter (not . (`elem` ("()->" :: String)))
 
 parseSingle t = lLength result == 1
   where Just result = parse funType . S.fromString . inParens $ t
+
+asString :: S.Stringable a => (String -> String) -> a -> a
+asString f = S.fromString . f . S.toString

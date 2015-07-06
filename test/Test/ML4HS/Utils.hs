@@ -7,9 +7,11 @@ import Test.QuickCheck
 
 -- Stringly-type our components
 
-newtype Pkg  = P String deriving (Show)
-newtype Mod  = M String deriving (Show)
-newtype Name = N String deriving (Show)
+newtype Pkg  = P  { unPkg  :: String } deriving (Show)
+newtype Mod  = M  { unMod  :: String } deriving (Show)
+newtype Name = N  { unName :: String } deriving (Show)
+newtype Type = T  { unType :: String } deriving (Show)
+newtype TArg = TA { unTArg :: String } deriving (Show)
 
 instance Arbitrary Pkg where
   arbitrary = fmap P $ listOf1 (elements (lower ++ "-0123456789"))
@@ -26,6 +28,11 @@ instance Arbitrary Name where
     init <- elements lower
     rest <- listOf (elements (lower ++ upper ++ "'_"))
     return (N (init:rest))
+
+instance Arbitrary TArg where
+  arbitrary = do
+    ts <- listOf1 arbitrary
+    return . TA . unwords . map (\(M x) -> x) $ ts
 
 -- Custom generators
 
