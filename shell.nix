@@ -5,7 +5,8 @@ let
   inherit (nixpkgs) pkgs;
 
   f = { mkDerivation, atto-lisp, attoparsec, base, bytestring
-      , QuickCheck, stdenv, stringable, tasty, tasty-quickcheck, text
+      , HS2AST, QuickCheck, stdenv, stringable, tasty, tasty-quickcheck
+      , text
       }:
       mkDerivation {
         pname = "ML4HSHelper";
@@ -14,11 +15,11 @@ let
         isLibrary = false;
         isExecutable = true;
         buildDepends = [
-          atto-lisp attoparsec base bytestring stringable text
+          atto-lisp attoparsec base bytestring HS2AST stringable text
         ];
         testDepends = [
-          atto-lisp attoparsec base bytestring QuickCheck stringable tasty
-          tasty-quickcheck text
+          atto-lisp attoparsec base bytestring HS2AST QuickCheck stringable
+          tasty tasty-quickcheck text
         ];
         homepage = "http://chriswarbo.net/git/ml4hs-helper";
         description = "Helper functions for ML4HS";

@@ -10,5 +10,5 @@ import Test.Tasty.QuickCheck
 main = defaultMain $ testGroup "All tests" [
     OC.tests
   , TC.tests
-  , T.tests
+  ,  T.tests
   ]

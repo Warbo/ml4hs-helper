@@ -2,6 +2,7 @@
 module Test.ML4HS.OrdCommand where
 
 import Data.List
+import Data.Maybe
 import qualified Data.Stringable as S
 import qualified Data.Text       as T
 import ML4HS
@@ -17,6 +18,7 @@ tests = testGroup "ordCommand tests" [
 ordLineArgCount (NonEmpty ts) (QN n) = argCount == length ts
   where argCount = length                .
                    T.splitOn "undefined" .
+                   fromJust              .
                    ordLine               .
                    S.fromString          $
                    n ++ " :: " ++ intercalate " -> " (map unTArg ts)

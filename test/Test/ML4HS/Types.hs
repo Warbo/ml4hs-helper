@@ -32,7 +32,7 @@ parseParens (NonEmpty ts) = lLength (uParse funType (typeStr ts')) == length ts'
         typeStr               = mkFunType . map mkChunk
 
 arityMatches :: NonEmptyList TArg -> Bool
-arityMatches (NonEmpty ts) = arity (mkFunType ts) == length ts - 1
+arityMatches (NonEmpty ts) = arity (mkFunType ts) == Just (length ts - 1)
 
 -- Helpers
 
@@ -47,3 +47,6 @@ asString f = S.fromString . f . S.toString
 
 mkFunType :: S.Stringable a => [a] -> T.Text
 mkFunType = T.intercalate " -> " . map reString
+
+uParse p x = let Just result = parse p x
+              in result

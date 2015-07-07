@@ -2,11 +2,11 @@
 module ML4HS where
 
 import Data.Maybe
-import qualified Data.Attoparsec.Text       as AT
-import qualified Data.ByteString            as B
-import qualified Data.AttoLisp              as L
-import qualified Data.Stringable            as S
-import qualified Data.Text                  as T
+import qualified Data.Attoparsec.Text as AT
+import qualified Data.ByteString      as B
+import qualified Data.AttoLisp        as L
+import qualified Data.Stringable      as S
+import qualified Data.Text            as T
 import ML4HS.RenderAsts
 import ML4HS.TypeCommand
 import ML4HS.Types
@@ -26,16 +26,19 @@ run args stdin = cmd stdin
 
 -- Try to partially-apply ">" to each value, to see if it admits an instance
 -- of Ord
-ordCommand = S.toString  .
-             T.unlines   .
-             (":m":)     .
-             map ordLine .
-             T.lines     .
+ordCommand = S.toString       .
+             T.unlines        .
+             (":m":)          .
+             mapMaybe ordLine .
+             T.lines          .
              S.fromString
 
-ordLine x = T.concat [":t (", applyTo ">" result, ")"]
+ordLine :: T.Text -> Maybe T.Text
+ordLine x = case result of
+                 Nothing -> Nothing
+                 Just r  -> Just (T.concat [":t (", applyTo ">" r, ")"])
   where [name, typeStr] = T.splitOn " :: " x
-        result = addArgs name (arity typeStr)
+        result = fmap (addArgs name) (arity typeStr)
 
 applyTo x y = T.concat ["(", x, ") (", y, ")"]
 

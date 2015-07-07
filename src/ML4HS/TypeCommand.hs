@@ -3,6 +3,7 @@ module ML4HS.TypeCommand where
 
 import qualified Data.Stringable            as S
 import qualified Data.Text                  as T
+import HS2AST.Types
 import ML4HS.Lisp
 
 -- Build a command for GHCi to inspect the type of each name
