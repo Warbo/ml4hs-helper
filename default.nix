@@ -7,10 +7,10 @@ mkDerivation {
   src = ./.;
   isLibrary = false;
   isExecutable = true;
-  buildDepends = [
+  executableHaskellDepends = [
     atto-lisp attoparsec base bytestring HS2AST stringable text
   ];
-  testDepends = [
+  testHaskellDepends = [
     atto-lisp attoparsec base bytestring HS2AST QuickCheck stringable
     tasty tasty-quickcheck text
   ];

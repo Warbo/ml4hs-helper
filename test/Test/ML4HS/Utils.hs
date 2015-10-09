@@ -25,7 +25,7 @@ newtype TArg  = TA { unTArg  :: String } deriving (Show, IsString, S.Stringable)
 newtype QName = QN { unQName :: String } deriving (Show, IsString, S.Stringable)
 
 instance Arbitrary Pkg where
-  arbitrary = fmap P $ listOf1 (elements (lower ++ "-0123456789"))
+  arbitrary = P <$> listOf1 (elements (lower ++ "-0123456789"))
 
 instance Arbitrary Mod where
   arbitrary = fmap (M . intercalate "." . take 5) (listOf1 genBit)
