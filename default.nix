@@ -1,5 +1,5 @@
 { mkDerivation, atto-lisp, attoparsec, base, bytestring, HS2AST
-, QuickCheck, stdenv, stringable, tasty, tasty-quickcheck, text
+, stdenv, stringable, text
 }:
 mkDerivation {
   pname = "ML4HSHelper";
@@ -9,10 +9,6 @@ mkDerivation {
   isExecutable = true;
   executableHaskellDepends = [
     atto-lisp attoparsec base bytestring HS2AST stringable text
-  ];
-  testHaskellDepends = [
-    atto-lisp attoparsec base bytestring HS2AST QuickCheck stringable
-    tasty tasty-quickcheck text
   ];
   homepage = "http://chriswarbo.net/git/ml4hs-helper";
   description = "Helper functions for ML4HS";
